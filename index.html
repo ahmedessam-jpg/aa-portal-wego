@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AA Portal – Wego Hotel L2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0d1117;--surface:#161b22;--surface2:#1c2128;--border:#30363d;--border2:#21262d;
+  --text1:#e6edf3;--text2:#8b949e;--text3:#6e7681;
+  --blue:#58a6ff;--blue-bg:rgba(88,166,255,0.1);
+  --green:#3fb950;--green-bg:rgba(63,185,80,0.1);
+  --amber:#f0c75e;--amber-bg:rgba(240,199,94,0.1);
+  --red:#f85149;--red-bg:rgba(248,81,73,0.1);
+  --purple:#bc8cff;--purple-bg:rgba(188,140,255,0.1);
+  --teal:#39d3c7;--teal-bg:rgba(57,211,199,0.1);
+  --gold:#d4a017;--gold-bg:rgba(212,160,23,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text1);font-family:'DM Sans',sans-serif;min-height:100vh;}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:radial-gradient(ellipse at 50% 0%,rgba(88,166,255,0.06) 0%,transparent 60%)}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:360px;text-align:center}
+.login-logo{width:56px;height:56px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;margin:0 auto 20px;color:#fff}
+.login-card h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.login-card p{color:var(--text2);font-size:13px;margin-bottom:24px}
+.login-tabs{display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:20px}
+.login-tab{flex:1;padding:8px;border:none;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text2);background:transparent;transition:all .2s}
+.login-tab.active{background:var(--surface2);color:var(--text1)}
+.login-input{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text1);font-size:14px;font-family:'DM Sans',sans-serif;margin-bottom:10px;outline:none;transition:border .2s}
+.login-input:focus{border-color:var(--blue)}
+.login-btn{width:100%;padding:11px;background:var(--blue);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.login-btn:hover{opacity:.85}
+.login-error{color:var(--red);font-size:12px;margin-top:8px;min-height:18px}
+.login-hint{color:var(--text3);font-size:12px;margin-top:10px}
+
+/* APP SHELL */
+#app{display:none;min-height:100vh}
+.sidebar{position:fixed;top:0;left:0;width:220px;height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.sidebar-logo .logo-mark{width:34px;height:34px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0}
+.sidebar-logo span{font-weight:700;font-size:14px}
+.sidebar-logo small{font-size:11px;color:var(--text2);display:block;margin-top:1px}
+.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .2s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left}
+.nav-item:hover{background:var(--surface2);color:var(--text1)}
+.nav-item.active{background:var(--blue-bg);color:var(--blue)}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;background:var(--red);color:#fff;border-radius:20px;padding:1px 6px}
+.sidebar-footer{padding:12px 10px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;cursor:pointer;transition:background .2s}
+.user-card:hover{background:var(--surface2)}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.user-card .info{flex:1;min-width:0}
+.user-card .info strong{font-size:13px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-card .info span{font-size:11px;color:var(--text2)}
+.logout-btn{background:transparent;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:6px;transition:color .2s}
+.logout-btn:hover{color:var(--red)}
+
+.main-area{margin-left:220px;padding:28px 28px;min-height:100vh}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-size:20px;font-weight:700}
+
+/* SCHEDULE */
+.schedule-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.view-btn{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.view-btn.active{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
+.month-select{padding:7px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text1);font-size:12px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer}
+.mgr-pill{display:none;align-items:center;gap:6px;padding:5px 12px;background:var(--amber-bg);border:1px solid var(--amber);border-radius:20px;color:var(--amber);font-size:11px;font-weight:600}
+
+/* WEEK BLOCK */
+.week-block{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.week-header{padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:8px}
+.week-table{width:100%;border-collapse:collapse}
+.week-table th{padding:8px 10px;font-size:11px;font-weight:600;color:var(--text2);text-align:center;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface2)}
+.week-table th.date-col{min-width:80px}
+.week-table td{padding:5px 6px;text-align:center;border-bottom:1px solid var(--border2);vertical-align:middle}
+.week-table tr:last-child td{border-bottom:none}
+.week-table td.agent-col{text-align:left;padding:5px 12px;white-space:nowrap}
+.agent-info{display:flex;align-items:center;gap:8px;cursor:pointer;position:relative}
+.agent-ava{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;flex-shrink:0}
+.agent-name{font-size:12px;font-weight:600}
+/* shift cells */
+.shift-pill{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;min-width:42px;cursor:default;position:relative;transition:transform .1s}
+.shift-pill:hover{transform:scale(1.05)}
+.s-EM{background:rgba(230,245,255,0.08);color:#93d5ff;border:1px solid rgba(147,213,255,0.25)}
+.s-M{background:rgba(63,185,80,0.1);color:#3fb950;border:1px solid rgba(63,185,80,0.25)}
+.s-LM{background:rgba(86,211,158,0.1);color:#56d39e;border:1px solid rgba(86,211,158,0.25)}
+.s-D{background:rgba(240,199,94,0.1);color:#f0c75e;border:1px solid rgba(240,199,94,0.25)}
+.s-MD{background:rgba(255,166,77,0.1);color:#ffa64d;border:1px solid rgba(255,166,77,0.25)}
+.s-N{background:rgba(188,140,255,0.1);color:#bc8cff;border:1px solid rgba(188,140,255,0.25)}
+.s-ON{background:rgba(45,55,90,0.4);color:#8b9edd;border:1px solid rgba(139,158,221,0.25)}
+.s-OFF{background:rgba(110,118,129,0.15);color:#6e7681;border:1px solid rgba(110,118,129,0.2)}
+.s-AN{background:rgba(57,211,199,0.1);color:#39d3c7;border:1px solid rgba(57,211,199,0.25)}
+.s-SP{background:rgba(248,81,73,0.1);color:#f85149;border:1px solid rgba(248,81,73,0.2)}
+.s-SUP{background:rgba(248,81,73,0.15);color:#ff6b63;border:1px solid rgba(248,81,73,0.3)}
+.s-TR{background:rgba(88,166,255,0.1);color:#58a6ff;border:1px solid rgba(88,166,255,0.25)}
+.s-NS{background:rgba(248,81,73,0.2);color:#ff4444;border:1px solid rgba(248,81,73,0.4)}
+.s-DASH{background:transparent;color:var(--text3);border:1px solid var(--border2)}
+.holiday-tag{font-size:9px;color:var(--gold);background:var(--gold-bg);border:1px solid var(--gold);border-radius:4px;padding:1px 4px;display:block;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:74px}
+/* today highlight */
+.today-col{background:rgba(88,166,255,0.04)}
+.today-col th{color:var(--blue)!important}
+
+/* AGENT TOOLTIP */
+.agent-tooltip{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;min-width:220px;max-width:260px;z-index:999;pointer-events:none;display:none;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.tt-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.tt-name{font-weight:700;font-size:14px}
+.tt-title{font-size:11px;color:var(--text2);margin-top:1px}
+.tt-row{display:flex;gap:6px;margin-bottom:5px;font-size:12px}
+.tt-label{color:var(--text3);width:50px;flex-shrink:0}
+.tt-val{color:var(--text1);font-weight:500}
+.tt-tasks{margin-top:10px;border-top:1px solid var(--border);padding-top:10px}
+.tt-tasks-title{font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600}
+.tt-task{display:flex;align-items:center;gap:7px;font-size:12px;padding:3px 0;cursor:pointer}
+.tt-task input{width:14px;height:14px;cursor:pointer;accent-color:var(--green)}
+
+/* SHIFT TOOLTIP */
+.shift-tooltip{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 14px;z-index:999;pointer-events:none;display:none;font-size:12px;box-shadow:0 4px 16px rgba(0,0,0,0.4)}
+.shift-tooltip strong{display:block;font-size:13px;margin-bottom:2px}
+.shift-tooltip span{color:var(--text2)}
+
+/* REQUESTS */
+.request-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px}
+.req-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px}
+.req-el{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber)}
+.req-la{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue)}
+.req-info{flex:1}
+.req-info strong{font-size:13px;font-weight:600}
+.req-info span{font-size:12px;color:var(--text2);display:block;margin-top:2px}
+.req-actions{display:flex;gap:6px;margin-top:8px}
+.btn-approve{padding:5px 12px;background:var(--green-bg);border:1px solid var(--green);color:var(--green);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-reject{padding:5px 12px;background:var(--red-bg);border:1px solid var(--red);color:var(--red);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* REQUEST FORM */
+.req-form{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;max-width:440px;margin-bottom:20px}
+.req-form h3{font-size:15px;font-weight:700;margin-bottom:14px}
+.form-group{margin-bottom:12px}
+.form-group label{font-size:12px;color:var(--text2);display:block;margin-bottom:5px;font-weight:500}
+.form-group select,.form-group input,.form-group textarea{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none}
+.form-group textarea{height:70px;resize:vertical}
+.form-group select:focus,.form-group input:focus,.form-group textarea:focus{border-color:var(--blue)}
+.btn-submit{padding:9px 20px;background:var(--blue);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* JOURNAL */
+.journal-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;min-width:220px;width:220px;flex-shrink:0;align-self:flex-start;position:sticky;top:20px}
+.journal-title{font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.journal-item{padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid}
+.j-off{border-color:var(--text3);background:rgba(110,118,129,0.08)}
+.j-sick{border-color:var(--red);background:var(--red-bg)}
+.j-leave{border-color:var(--teal);background:var(--teal-bg)}
+.j-ns{border-color:var(--amber);background:var(--amber-bg)}
+.journal-item .j-name{font-size:12px;font-weight:600}
+.journal-item .j-type{font-size:10px;color:var(--text2);margin-top:2px}
+.j-empty{font-size:12px;color:var(--text3);text-align:center;padding:12px 0}
+
+/* MANAGER FAB */
+#mgr-fab{position:fixed;bottom:24px;right:24px;background:var(--blue);border:none;width:48px;height:48px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(88,166,255,0.3);z-index:200;transition:transform .2s;display:none}
+#mgr-fab:hover{transform:scale(1.08)}
+
+/* MANAGER PANEL */
+#mgr-panel{position:fixed;top:0;right:-420px;width:400px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:300;transition:right .3s;overflow-y:auto;padding:24px}
+#mgr-panel.open{right:0}
+.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.panel-header h2{font-size:16px;font-weight:700}
+.close-btn{background:transparent;border:none;color:var(--text2);cursor:pointer;font-size:20px;padding:4px}
+
+/* SHIFT EDITOR */
+.edit-cell{cursor:pointer;position:relative}
+.edit-cell:hover .shift-pill{outline:2px solid var(--blue);outline-offset:1px}
+.shift-dropdown{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:10px;z-index:500;box-shadow:0 8px 24px rgba(0,0,0,0.5);padding:8px;display:none;max-height:300px;overflow-y:auto;min-width:150px}
+.shift-option{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;transition:background .15s}
+.shift-option:hover{background:var(--surface2)}
+.shift-option .dot{width:10px;height:10px;border-radius:50%}
+
+/* TABS */
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* DRAFT TABS */
+.draft-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:320px;color:var(--text3);gap:12px}
+.draft-placeholder svg{opacity:.3}
+.draft-placeholder h3{font-size:15px;font-weight:600;color:var(--text2)}
+.draft-placeholder p{font-size:13px;text-align:center;max-width:280px;line-height:1.6}
+
+/* SORT/FILTER BAR */
+#sort-filter-bar{display:none;align-items:center;gap:10px;margin-bottom:14px}
+.agent-filter-wrap{position:relative}
+#agent-filter-btn{padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
+.agent-filter-dropdown{position:absolute;top:calc(100% + 6px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;min-width:200px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:none}
+.agent-filter-dropdown.open{display:block}
+.afd-search{padding:10px;border-bottom:1px solid var(--border)}
+.afd-search input{width:100%;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text1);font-size:12px;font-family:'DM Sans',sans-serif;outline:none}
+.afd-list{max-height:200px;overflow-y:auto;padding:6px}
+.afd-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;transition:background .15s}
+.afd-item:hover{background:var(--surface2)}
+.afd-item.selected{color:var(--blue);background:var(--blue-bg)}
+
+/* SORT BTN */
+#sort-btn{padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .2s}
+#sort-btn.active{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
+
+/* AGENT FILTER ACTIVE TAG */
+#af-active-tag{display:none;align-items:center;gap:6px;padding:4px 10px;background:var(--blue-bg);border:1px solid var(--blue);border-radius:20px;color:var(--blue);font-size:11px;font-weight:600;cursor:pointer}
+
+/* PENDING REQUESTS SECTION */
+#requests-section{display:none;margin-top:24px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">AA</div>
+    <h2>Agent Assist Portal</h2>
+    <p>Hotel L2 Support · Wego</p>
+    <div id="login-step-1">
+      <div class="login-tabs" style="margin-bottom:20px">
+        <button class="login-tab active" id="tab-agent-btn" onclick="showLoginRole('agent')">Agent</button>
+        <button class="login-tab" id="tab-mgr-btn" onclick="showLoginRole('manager')">Manager</button>
+      </div>
+      <div id="agent-login-area">
+        <input class="login-input" id="login-name" type="text" placeholder="Your name" autocomplete="off" onkeydown="if(event.key==='Enter')doAgentLogin()"/>
+        <button class="login-btn" onclick="doAgentLogin()">Sign In</button>
+        <p class="login-error" id="login-error-agent"></p>
+      </div>
+      <div id="mgr-login-area" style="display:none">
+        <input class="login-input" id="login-pass" type="password" placeholder="Manager password" autocomplete="off" onkeydown="if(event.key==='Enter')doManagerLogin()"/>
+        <button class="login-btn" onclick="doManagerLogin()">Sign In as Manager</button>
+        <p class="login-error" id="login-error-mgr"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">AA</div>
+      <div><span>AA Portal</span><small>Hotel L2 · Wego</small></div>
+    </div>
+    <nav class="sidebar-nav" id="main-nav">
+      <button class="nav-item active" onclick="switchTab('schedule',this)">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.4"/><line x1="1" y1="5" x2="14" y2="5" stroke="currentColor" stroke-width="1.2"/><line x1="5" y1="1" x2="5" y2="5" stroke="currentColor" stroke-width="1.2"/><line x1="10" y1="1" x2="10" y2="5" stroke="currentColor" stroke-width="1.2"/></svg>
+        Schedule
+      </button>
+      <button class="nav-item" onclick="switchTab('requests',this)" id="nav-requests">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 2h11v9H2z" stroke="currentColor" stroke-width="1.3"/><line x1="4" y1="5" x2="11" y2="5" stroke="currentColor" stroke-width="1.2"/><line x1="4" y1="7.5" x2="11" y2="7.5" stroke="currentColor" stroke-width="1.2"/></svg>
+        Requests
+        <span class="nav-badge" id="req-badge" style="display:none">0</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('tab2',this)">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="6" stroke="currentColor" stroke-width="1.3"/><line x1="7.5" y1="4" x2="7.5" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="7.5" cy="10" r=".8" fill="currentColor"/></svg>
+        Tab 2
+      </button>
+      <button class="nav-item" onclick="switchTab('tab3',this)">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 13 L7.5 2 L13 13Z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
+        Tab 3
+      </button>
+      <button class="nav-item" onclick="switchTab('tab4',this)">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="2" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="2" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="9" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+        Tab 4
+      </button>
+      <button class="nav-item" onclick="switchTab('tab5',this)">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M13 7.5A5.5 5.5 0 1 1 7.5 2" stroke="currentColor" stroke-width="1.3"/><path d="M13 2v3.5H9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Tab 5
+      </button>
+      <button class="nav-item" onclick="switchTab('tab6',this)">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 4h11M2 7.5h11M2 11h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Tab 6
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card" title="Logged in as">
+        <div class="avatar" id="sidebar-avatar" style="background:var(--blue-bg);color:var(--blue)">?</div>
+        <div class="info">
+          <strong id="sidebar-name">—</strong>
+          <span id="sidebar-role">—</span>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Logout">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 2H2v10h3M9 4l3 3-3 3M12 7H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-area">
+    <!-- SCHEDULE TAB -->
+    <div id="tab-schedule" class="tab-content active">
+      <div class="page-header">
+        <div class="page-title">Work Schedule</div>
+        <div class="mgr-pill" id="mgr-pill">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="4" r="2.2" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 10.5c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Manager View
+        </div>
+      </div>
+      <div class="schedule-controls">
+        <button class="view-btn active" onclick="setView('month',this)" id="vbtn-month">Month</button>
+        <button class="view-btn" onclick="setView('week',this)" id="vbtn-week">Week</button>
+        <button class="view-btn" onclick="setView('today',this)" id="vbtn-today">Today</button>
+        <select class="month-select" id="month-select" onchange="renderSchedule()"></select>
+        <div id="sort-filter-bar">
+          <div class="agent-filter-wrap">
+            <button id="agent-filter-btn" onclick="toggleAgentDropdown()">All Agents ▾</button>
+            <div class="agent-filter-dropdown" id="agent-filter-dd">
+              <div class="afd-search"><input type="text" id="afd-search-input" placeholder="Search agent…" oninput="filterAgentList()"/></div>
+              <div class="afd-list" id="afd-list"></div>
+            </div>
+          </div>
+          <div id="af-active-tag" onclick="clearAgentFilter()">
+            <span id="af-tag-name"></span> ✕
+          </div>
+          <button id="sort-btn" onclick="toggleSort()">Sort by Shift</button>
+          <button onclick="resetWeekSchedule()" style="padding:6px 12px;background:var(--red-bg);border:1px solid var(--red);border-radius:8px;color:var(--red);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">↺ Reset Week</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:18px;align-items:flex-start">
+        <div id="sched-blocks" style="flex:1;min-width:0"></div>
+        <div class="journal-panel" id="journal-panel">
+          <div class="journal-title">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><line x1="3.5" y1="4" x2="9.5" y2="4" stroke="currentColor" stroke-width="1.2"/><line x1="3.5" y1="6.5" x2="9.5" y2="6.5" stroke="currentColor" stroke-width="1.2"/><line x1="3.5" y1="9" x2="7" y2="9" stroke="currentColor" stroke-width="1.2"/></svg>
+            Journal
+          </div>
+          <div id="journal-body"><div class="j-empty">Select a view to see absence info</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REQUESTS TAB -->
+    <div id="tab-requests" class="tab-content">
+      <div class="page-header">
+        <div class="page-title">Requests</div>
+      </div>
+      <div id="agent-req-form" style="display:none">
+        <div class="req-form">
+          <h3>Submit a Request</h3>
+          <div class="form-group">
+            <label>Request Type</label>
+            <select id="req-type">
+              <option value="EL">Early Leave</option>
+              <option value="LA">Late Arrival</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="req-date"/>
+          </div>
+          <div class="form-group">
+            <label>Reason</label>
+            <textarea id="req-reason" placeholder="Brief reason…"></textarea>
+          </div>
+          <button class="btn-submit" onclick="submitRequest()">Submit Request</button>
+          <p style="font-size:11px;color:var(--text3);margin-top:8px">Your manager will be notified and will approve or reject this request.</p>
+        </div>
+      </div>
+      <div id="mgr-requests-list" style="display:none">
+        <div style="font-size:14px;font-weight:600;margin-bottom:14px">Pending Requests <span id="req-count-badge" style="font-size:11px;background:var(--amber-bg);color:var(--amber);padding:2px 8px;border-radius:20px;margin-left:6px">0</span></div>
+        <div id="req-list-body"></div>
+      </div>
+      <div id="all-requests-log" style="margin-top:24px">
+        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px">All Requests</div>
+        <div id="req-log-body"></div>
+      </div>
+    </div>
+
+    <!-- DRAFT TABS -->
+    <div id="tab-tab2" class="tab-content">
+      <div class="draft-placeholder"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="4" y="4" width="40" height="40" rx="8" stroke="currentColor" stroke-width="2"/><line x1="14" y1="24" x2="34" y2="24" stroke="currentColor" stroke-width="2"/><line x1="24" y1="14" x2="24" y2="34" stroke="currentColor" stroke-width="2"/></svg><h3>Tab 2</h3><p>Coming soon — this tab is reserved for your next feature.</p></div>
+    </div>
+    <div id="tab-tab3" class="tab-content">
+      <div class="draft-placeholder"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="4" y="4" width="40" height="40" rx="8" stroke="currentColor" stroke-width="2"/><line x1="14" y1="24" x2="34" y2="24" stroke="currentColor" stroke-width="2"/><line x1="24" y1="14" x2="24" y2="34" stroke="currentColor" stroke-width="2"/></svg><h3>Tab 3</h3><p>Coming soon.</p></div>
+    </div>
+    <div id="tab-tab4" class="tab-content">
+      <div class="draft-placeholder"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="4" y="4" width="40" height="40" rx="8" stroke="currentColor" stroke-width="2"/><line x1="14" y1="24" x2="34" y2="24" stroke="currentColor" stroke-width="2"/><line x1="24" y1="14" x2="24" y2="34" stroke="currentColor" stroke-width="2"/></svg><h3>Tab 4</h3><p>Coming soon.</p></div>
+    </div>
+    <div id="tab-tab5" class="tab-content">
+      <div class="draft-placeholder"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="4" y="4" width="40" height="40" rx="8" stroke="currentColor" stroke-width="2"/><line x1="14" y1="24" x2="34" y2="24" stroke="currentColor" stroke-width="2"/><line x1="24" y1="14" x2="24" y2="34" stroke="currentColor" stroke-width="2"/></svg><h3>Tab 5</h3><p>Coming soon.</p></div>
+    </div>
+    <div id="tab-tab6" class="tab-content">
+      <div class="draft-placeholder"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="4" y="4" width="40" height="40" rx="8" stroke="currentColor" stroke-width="2"/><line x1="14" y1="24" x2="34" y2="24" stroke="currentColor" stroke-width="2"/><line x1="24" y1="14" x2="24" y2="34" stroke="currentColor" stroke-width="2"/></svg><h3>Tab 6</h3><p>Coming soon.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLTIPS -->
+<div class="agent-tooltip" id="agent-tooltip"></div>
+<div class="shift-tooltip" id="shift-tooltip"></div>
+<div class="shift-dropdown" id="shift-dropdown"></div>
+
+<!-- MANAGER FAB -->
+<button id="mgr-fab" onclick="toggleMgrPanel()">
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="6.5" r="3" stroke="white" stroke-width="1.6"/><path d="M3 17c0-3.5 3.1-6 7-6s7 2.5 7 6" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+</button>
+
+<!-- MANAGER PANEL -->
+<div id="mgr-panel">
+  <div class="panel-header">
+    <h2>Manager Settings</h2>
+    <button class="close-btn" onclick="toggleMgrPanel()">✕</button>
+  </div>
+  <div style="font-size:12px;color:var(--text2);margin-bottom:16px">Edit agent mentors and portal settings.</div>
+  <div id="mentor-editor"></div>
+  <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+    <div style="font-size:13px;font-weight:600;margin-bottom:10px">Danger Zone</div>
+    <button onclick="resetAllData()" style="padding:8px 16px;background:var(--red-bg);border:1px solid var(--red);border-radius:8px;color:var(--red);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%">↺ Reset All Portal Data</button>
+  </div>
+</div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────
+const AGENTS = [
+  {name:"Ahmed Adel",    email:"ahmed.adel@wego.com",    gender:"Male",   title:"Hotel L2 Support Lead",         role:"Lead",         skill:"Operations & QA",     tasks:["Team coordination","QA reviews","Escalation handling"],        mentor:""},
+  {name:"Younan Youssef",email:"younan.youssef@wego.com", gender:"Male",   title:"Hotel L2 Support Specialist",   role:"Task Support", skill:"Blended Support",     tasks:["Support ticket handling","Shift briefings"],                   mentor:"Ahmed Adel"},
+  {name:"Christina Khalil",email:"christina.khalil@wego.com",gender:"Female",title:"Hotel L2 Support Specialist",role:"Task Support",skill:"Blended Support",       tasks:["Support ticket handling","Customer follow-ups"],               mentor:"Ahmed Adel"},
+  {name:"Waleed Tolba",  email:"waleed.tolba@wego.com",  gender:"Male",   title:"Hotel L2 Support Specialist",   role:"Task Support", skill:"Voice Support",        tasks:["Inbound calls","Complaint resolution"],                        mentor:"Khaled ElBanna"},
+  {name:"Ahmed Ehab",    email:"ahmed.ehab@wego.com",    gender:"Male",   title:"Hotel L2 Support Specialist",   role:"Task Support", skill:"Blended Support",     tasks:["Support ticket handling","Follow-ups"],                        mentor:"Ahmed Adel"},
+  {name:"Salwa Jamal",   email:"salwa.jamal@wego.com",   gender:"Female", title:"Hotel L2 Support Specialist",   role:"Task Support", skill:"Blended Support",     tasks:["Support ticket handling","Customer follow-ups"],               mentor:"Christina Khalil"},
+  {name:"Ghada Ibraheem",email:"ghada.ibraheem@wego.com",gender:"Female", title:"Hotel L2 Support Specialist",   role:"Task Support", skill:"Blended Support",     tasks:["Support ticket handling","Shift briefings"],                   mentor:"Christina Khalil"},
+  {name:"Shahd Elhinawy",email:"shahd.elhinawy@wego.com",gender:"Female", title:"Hotel L2 Support Specialist",   role:"Task Support", skill:"Voice Support",        tasks:["Inbound calls","Customer follow-ups"],                         mentor:"Salwa Jamal"},
+  {name:"Merna Kamal",   email:"merna.kamal@wego.com",   gender:"Female", title:"Hotel L2 Support Specialist",   role:"Task Support", skill:"Blended Support",     tasks:["Support ticket handling","Escalation assist"],                 mentor:"Khaled ElBanna"},
+  {name:"Rawda Ibrahim", email:"rawda.ibrahim@wego.com", gender:"Female", title:"Hotel L2 Support Specialist",   role:"Task Support", skill:"Blended Support",     tasks:["Support ticket handling","Quality checks"],                    mentor:"Ahmed Adel"},
+  {name:"Enas Yehia",    email:"enas.yehia@wego.com",    gender:"Female", title:"Hotel L2 Support Specialist",   role:"Task Support", skill:"Blended Support",     tasks:["Support ticket handling","Customer follow-ups"],               mentor:"Ghada Ibraheem"},
+  {name:"Khaled ElBanna",email:"khaled.elbanna@wego.com",gender:"Male",   title:"Hotel L2 Support Senior Spec.", role:"Senior",       skill:"Voice & Blended",     tasks:["Escalation handling","Team mentoring","Quality monitoring"],   mentor:"Ahmed Adel"},
+  {name:"Eslam Ashraf",  email:"eslam.ashraf@wego.com",  gender:"Male",   title:"Hotel L2 Support Specialist",   role:"Task Support", skill:"Blended Support",     tasks:["Support ticket handling","Customer follow-ups"],               mentor:"Khaled ElBanna"},
+];
+
+const SHIFTS = {
+  "EM": {time:"8:00 AM – 5:00 PM",   name:"Early Morning",    cls:"s-EM"},
+  "M":  {time:"9:00 AM – 6:00 PM",   name:"Morning",          cls:"s-M"},
+  "LM": {time:"10:00 AM – 7:00 PM",  name:"Late Morning",     cls:"s-LM"},
+  "D":  {time:"12:00 PM – 9:00 PM",  name:"Day",              cls:"s-D"},
+  "MD": {time:"2:00 PM – 11:00 PM",  name:"Midday",           cls:"s-MD"},
+  "N":  {time:"3:00 PM – 12:00 AM",  name:"Night",            cls:"s-N"},
+  "ON": {time:"11:00 PM – 8:00 AM",  name:"Overnight",        cls:"s-ON"},
+  "OFF":{time:"Day Off",             name:"OFF",              cls:"s-OFF"},
+  "AN": {time:"Annual Leave",        name:"Annual",           cls:"s-AN"},
+  "SP": {time:"Sick (Planned)",      name:"Sick Planned",     cls:"s-SP"},
+  "SUP":{time:"Sick (Unplanned)",    name:"Sick Unplanned",   cls:"s-SUP"},
+  "TR": {time:"Training",            name:"Training",         cls:"s-TR"},
+  "NS": {time:"No Show",             name:"No Show",          cls:"s-NS"},
+  "-":  {time:"—",                   name:"—",                cls:"s-DASH"},
+  "R-EM":{time:"7:00 AM – 2:00 PM",  name:"Ramadan EM",       cls:"s-EM"},
+  "R-M": {time:"9:00 AM – 4:00 PM",  name:"Ramadan M",        cls:"s-M"},
+  "R-LM":{time:"10:00 AM – 5:00 PM", name:"Ramadan LM",       cls:"s-LM"},
+  "R-D": {time:"12:00 PM – 7:00 PM", name:"Ramadan Day",      cls:"s-D"},
+  "R-MD":{time:"2:00 PM – 9:00 PM",  name:"Ramadan Midday",   cls:"s-MD"},
+  "R-N": {time:"3:00 PM – 10:00 PM", name:"Ramadan Night",    cls:"s-N"},
+  "R-ON":{time:"12:00 AM – 7:00 AM", name:"Ramadan Overnight",cls:"s-ON"},
+};
+
+const HOLIDAYS = {
+  "2025-04-13":"Sham El-Nessim","2025-04-25":"Sinai Liberation",
+  "2025-05-01":"Labor Day","2025-05-26":"Arafat Day",
+  "2025-05-27":"Eid Al-Adha","2025-05-28":"Eid Al-Adha","2025-05-29":"Eid Al-Adha",
+  "2025-06-16":"Islamic New Year","2025-06-30":"June 30 Revolution",
+  "2025-07-23":"July 23 Revolution","2025-08-26":"Prophet's Birthday","2025-10-06":"Armed Forces Day",
+};
+
+const SCHED_2025_04 = {
+  "2025-04-01":{"Ahmed Adel":"MD","Younan Youssef":"LM","Christina Khalil":"EM","Waleed Tolba":"LM","Ahmed Ehab":"MD","Salwa Jamal":"OFF","Ghada Ibraheem":"-","Shahd Elhinawy":"EM","Merna Kamal":"LM","Rawda Ibrahim":"M","Enas Yehia":"EM","Khaled ElBanna":"D","Eslam Ashraf":"MD"},
+  "2025-04-02":{"Ahmed Adel":"OFF","Younan Youssef":"LM","Christina Khalil":"EM","Waleed Tolba":"LM","Ahmed Ehab":"MD","Salwa Jamal":"OFF","Ghada Ibraheem":"-","Shahd Elhinawy":"LM","Merna Kamal":"D","Rawda Ibrahim":"M","Enas Yehia":"EM","Khaled ElBanna":"D","Eslam Ashraf":"MD"},
+  "2025-04-03":{"Ahmed Adel":"OFF","Younan Youssef":"LM","Christina Khalil":"EM","Waleed Tolba":"LM","Ahmed Ehab":"M","Salwa Jamal":"AN","Ghada Ibraheem":"-","Shahd Elhinawy":"LM","Merna Kamal":"D","Rawda Ibrahim":"OFF","Enas Yehia":"EM","Khaled ElBanna":"MD","Eslam Ashraf":"MD"},
+  "2025-04-04":{"Ahmed Adel":"M","Younan Youssef":"LM","Christina Khalil":"EM","Waleed Tolba":"OFF","Ahmed Ehab":"M","Salwa Jamal":"AN","Ghada Ibraheem":"-","Shahd Elhinawy":"LM","Merna Kamal":"D","Rawda Ibrahim":"EM","Enas Yehia":"OFF","Khaled ElBanna":"MD","Eslam Ashraf":"OFF"},
+  "2025-04-05":{"Ahmed Adel":"M","Younan Youssef":"OFF","Christina Khalil":"EM","Waleed Tolba":"LM","Ahmed Ehab":"M","Salwa Jamal":"M","Ghada Ibraheem":"-","Shahd Elhinawy":"LM","Merna Kamal":"OFF","Rawda Ibrahim":"EM","Enas Yehia":"M","Khaled ElBanna":"MD","Eslam Ashraf":"M"},
+  "2025-04-06":{"Ahmed Adel":"M","Younan Youssef":"M","Christina Khalil":"OFF","Waleed Tolba":"LM","Ahmed Ehab":"M","Salwa Jamal":"M","Ghada Ibraheem":"-","Shahd Elhinawy":"OFF","Merna Kamal":"LM","Rawda Ibrahim":"EM","Enas Yehia":"M","Khaled ElBanna":"OFF","Eslam Ashraf":"M"},
+  "2025-04-07":{"Ahmed Adel":"M","Younan Youssef":"M","Christina Khalil":"EM","Waleed Tolba":"OFF","Ahmed Ehab":"OFF","Salwa Jamal":"M","Ghada Ibraheem":"-","Shahd Elhinawy":"LM","Merna Kamal":"LM","Rawda Ibrahim":"EM","Enas Yehia":"M","Khaled ElBanna":"MD","Eslam Ashraf":"M"},
+  "2025-04-08":{"Ahmed Adel":"LM","Younan Youssef":"M","Christina Khalil":"EM","Waleed Tolba":"LM","Ahmed Ehab":"D","Salwa Jamal":"M","Ghada Ibraheem":"-","Shahd Elhinawy":"LM","Merna Kamal":"LM","Rawda Ibrahim":"EM","Enas Yehia":"LM","Khaled ElBanna":"MD","Eslam Ashraf":"D"},
+  "2025-04-09":{"Ahmed Adel":"LM","Younan Youssef":"M","Christina Khalil":"OFF","Waleed Tolba":"LM","Ahmed Ehab":"D","Salwa Jamal":"M","Ghada Ibraheem":"-","Shahd Elhinawy":"LM","Merna Kamal":"OFF","Rawda Ibrahim":"EM","Enas Yehia":"LM","Khaled ElBanna":"OFF","Eslam Ashraf":"D"},
+  "2025-04-10":{"Ahmed Adel":"LM","Younan Youssef":"OFF","Christina Khalil":"EM","Waleed Tolba":"OFF","Ahmed Ehab":"D","Salwa Jamal":"LM","Ghada Ibraheem":"-","Shahd Elhinawy":"OFF","Merna Kamal":"D","Rawda Ibrahim":"OFF","Enas Yehia":"LM","Khaled ElBanna":"D","Eslam Ashraf":"D"},
+  "2025-04-11":{"Ahmed Adel":"OFF","Younan Youssef":"LM","Christina Khalil":"EM","Waleed Tolba":"D","Ahmed Ehab":"D","Salwa Jamal":"LM","Ghada Ibraheem":"-","Shahd Elhinawy":"D","Merna Kamal":"D","Rawda Ibrahim":"M","Enas Yehia":"LM","Khaled ElBanna":"D","Eslam Ashraf":"OFF"},
+  "2025-04-12":{"Ahmed Adel":"OFF","Younan Youssef":"LM","Christina Khalil":"EM","Waleed Tolba":"D","Ahmed Ehab":"OFF","Salwa Jamal":"LM","Ghada Ibraheem":"-","Shahd Elhinawy":"D","Merna Kamal":"D","Rawda Ibrahim":"M","Enas Yehia":"LM","Khaled ElBanna":"D","Eslam Ashraf":"LM"},
+  "2025-04-13":{"Ahmed Adel":"D","Younan Youssef":"OFF","Christina Khalil":"OFF","Waleed Tolba":"D","Ahmed Ehab":"D","Salwa Jamal":"OFF","Ghada Ibraheem":"-","Shahd Elhinawy":"D","Merna Kamal":"OFF","Rawda Ibrahim":"M","Enas Yehia":"OFF","Khaled ElBanna":"D","Eslam Ashraf":"LM"},
+  "2025-04-14":{"Ahmed Adel":"D","Younan Youssef":"D","Christina Khalil":"LM","Waleed Tolba":"D","Ahmed Ehab":"MD","Salwa Jamal":"D","Ghada Ibraheem":"-","Shahd Elhinawy":"D","Merna Kamal":"MD","Rawda Ibrahim":"LM","Enas Yehia":"D","Khaled ElBanna":"MD","Eslam Ashraf":"LM"},
+  "2025-04-15":{"Ahmed Adel":"D","Younan Youssef":"D","Christina Khalil":"LM","Waleed Tolba":"D","Ahmed Ehab":"MD","Salwa Jamal":"D","Ghada Ibraheem":"-","Shahd Elhinawy":"D","Merna Kamal":"MD","Rawda Ibrahim":"LM","Enas Yehia":"D","Khaled ElBanna":"MD","Eslam Ashraf":"D"},
+  "2025-04-16":{"Ahmed Adel":"D","Younan Youssef":"D","Christina Khalil":"OFF","Waleed Tolba":"OFF","Ahmed Ehab":"MD","Salwa Jamal":"D","Ghada Ibraheem":"-","Shahd Elhinawy":"OFF","Merna Kamal":"MD","Rawda Ibrahim":"LM","Enas Yehia":"D","Khaled ElBanna":"OFF","Eslam Ashraf":"D"},
+  "2025-04-17":{"Ahmed Adel":"OFF","Younan Youssef":"D","Christina Khalil":"LM","Waleed Tolba":"MD","Ahmed Ehab":"OFF","Salwa Jamal":"OFF","Ghada Ibraheem":"-","Shahd Elhinawy":"MD","Merna Kamal":"MD","Rawda Ibrahim":"OFF","Enas Yehia":"OFF","Khaled ElBanna":"MD","Eslam Ashraf":"D"},
+  "2025-04-18":{"Ahmed Adel":"MD","Younan Youssef":"D","Christina Khalil":"LM","Waleed Tolba":"MD","Ahmed Ehab":"N","Salwa Jamal":"MD","Ghada Ibraheem":"-","Shahd Elhinawy":"MD","Merna Kamal":"N","Rawda Ibrahim":"D","Enas Yehia":"MD","Khaled ElBanna":"MD","Eslam Ashraf":"N"},
+  "2025-04-19":{"Ahmed Adel":"MD","Younan Youssef":"OFF","Christina Khalil":"D","Waleed Tolba":"MD","Ahmed Ehab":"N","Salwa Jamal":"MD","Ghada Ibraheem":"-","Shahd Elhinawy":"MD","Merna Kamal":"N","Rawda Ibrahim":"D","Enas Yehia":"MD","Khaled ElBanna":"OFF","Eslam Ashraf":"N"},
+  "2025-04-20":{"Ahmed Adel":"MD","Younan Youssef":"MD","Christina Khalil":"D","Waleed Tolba":"OFF","Ahmed Ehab":"N","Salwa Jamal":"OFF","Ghada Ibraheem":"-","Shahd Elhinawy":"OFF","Merna Kamal":"OFF","Rawda Ibrahim":"D","Enas Yehia":"MD","Khaled ElBanna":"N","Eslam Ashraf":"OFF"},
+  "2025-04-21":{"Ahmed Adel":"N","Younan Youssef":"MD","Christina Khalil":"D","Waleed Tolba":"N","Ahmed Ehab":"OFF","Salwa Jamal":"N","Ghada Ibraheem":"-","Shahd Elhinawy":"N","Merna Kamal":"MD","Rawda Ibrahim":"OFF","Enas Yehia":"N","Khaled ElBanna":"N","Eslam Ashraf":"MD"},
+  "2025-04-22":{"Ahmed Adel":"N","Younan Youssef":"MD","Christina Khalil":"D","Waleed Tolba":"N","Ahmed Ehab":"ON","Salwa Jamal":"N","Ghada Ibraheem":"-","Shahd Elhinawy":"N","Merna Kamal":"MD","Rawda Ibrahim":"D","Enas Yehia":"N","Khaled ElBanna":"N","Eslam Ashraf":"MD"},
+  "2025-04-23":{"Ahmed Adel":"N","Younan Youssef":"OFF","Christina Khalil":"OFF","Waleed Tolba":"N","Ahmed Ehab":"ON","Salwa Jamal":"OFF","Ghada Ibraheem":"-","Shahd Elhinawy":"OFF","Merna Kamal":"OFF","Rawda Ibrahim":"D","Enas Yehia":"OFF","Khaled ElBanna":"OFF","Eslam Ashraf":"OFF"},
+  "2025-04-24":{"Ahmed Adel":"OFF","Younan Youssef":"N","Christina Khalil":"MD","Waleed Tolba":"OFF","Ahmed Ehab":"ON","Salwa Jamal":"ON","Ghada Ibraheem":"-","Shahd Elhinawy":"ON","Merna Kamal":"N","Rawda Ibrahim":"N","Enas Yehia":"ON","Khaled ElBanna":"ON","Eslam Ashraf":"N"},
+  "2025-04-25":{"Ahmed Adel":"ON","Younan Youssef":"N","Christina Khalil":"MD","Waleed Tolba":"ON","Ahmed Ehab":"M","Salwa Jamal":"ON","Ghada Ibraheem":"-","Shahd Elhinawy":"ON","Merna Kamal":"N","Rawda Ibrahim":"N","Enas Yehia":"ON","Khaled ElBanna":"ON","Eslam Ashraf":"N"},
+  "2025-04-26":{"Ahmed Adel":"ON","Younan Youssef":"N","Christina Khalil":"N","Waleed Tolba":"ON","Ahmed Ehab":"M","Salwa Jamal":"ON","Ghada Ibraheem":"-","Shahd Elhinawy":"ON","Merna Kamal":"N","Rawda Ibrahim":"N","Enas Yehia":"OFF","Khaled ElBanna":"ON","Eslam Ashraf":"N"},
+  "2025-04-27":{"Ahmed Adel":"ON","Younan Youssef":"N","Christina Khalil":"N","Waleed Tolba":"OFF","Ahmed Ehab":"M","Salwa Jamal":"OFF","Ghada Ibraheem":"-","Shahd Elhinawy":"OFF","Merna Kamal":"OFF","Rawda Ibrahim":"N","Enas Yehia":"EM","Khaled ElBanna":"OFF","Eslam Ashraf":"EM"},
+  "2025-04-28":{"Ahmed Adel":"OFF","Younan Youssef":"EM","Christina Khalil":"N","Waleed Tolba":"EM","Ahmed Ehab":"LM","Salwa Jamal":"EM","Ghada Ibraheem":"-","Shahd Elhinawy":"EM","Merna Kamal":"EM","Rawda Ibrahim":"N","Enas Yehia":"EM","Khaled ElBanna":"EM","Eslam Ashraf":"EM"},
+  "2025-04-29":{"Ahmed Adel":"EM","Younan Youssef":"EM","Christina Khalil":"EM","Waleed Tolba":"EM","Ahmed Ehab":"LM","Salwa Jamal":"EM","Ghada Ibraheem":"-","Shahd Elhinawy":"EM","Merna Kamal":"EM","Rawda Ibrahim":"OFF","Enas Yehia":"EM","Khaled ElBanna":"EM","Eslam Ashraf":"EM"},
+  "2025-04-30":{"Ahmed Adel":"EM","Younan Youssef":"EM","Christina Khalil":"EM","Waleed Tolba":"EM","Ahmed Ehab":"LM","Salwa Jamal":"EM","Ghada Ibraheem":"-","Shahd Elhinawy":"EM","Merna Kamal":"EM","Rawda Ibrahim":"EM","Enas Yehia":"EM","Khaled ElBanna":"EM","Eslam Ashraf":"LM"},
+};
+
+// Editable schedule stored in localStorage
+let schedData = {};
+let currentRole = null;
+let currentUser = null;
+let currentView = 'month';
+let currentMonth = '2025-04';
+let sortByShift = false;
+let agentFilter = null;
+let requests = [];
+let taskDone = {};
+let mentors = {};
+
+function loadState(){
+  try{ schedData = JSON.parse(localStorage.getItem('aa_sched')||'{}'); }catch(e){ schedData={}; }
+  try{ requests = JSON.parse(localStorage.getItem('aa_req')||'[]'); }catch(e){ requests=[]; }
+  try{ taskDone = JSON.parse(localStorage.getItem('aa_tasks')||'{}'); }catch(e){ taskDone={}; }
+  try{ mentors = JSON.parse(localStorage.getItem('aa_mentors')||'{}'); }catch(e){ mentors={}; }
+}
+function saveState(){
+  localStorage.setItem('aa_sched', JSON.stringify(schedData));
+  localStorage.setItem('aa_req', JSON.stringify(requests));
+  localStorage.setItem('aa_tasks', JSON.stringify(taskDone));
+  localStorage.setItem('aa_mentors', JSON.stringify(mentors));
+}
+
+function getShift(date, agentName){
+  const key = date+'|'+agentName;
+  if(schedData[key] !== undefined) return schedData[key];
+  const base = SCHED_2025_04;
+  if(base[date] && base[date][agentName] !== undefined) return base[date][agentName];
+  return '-';
+}
+
+// ─── LOGIN ────────────────────────────────────────────────────────────
+const MGR_PASS = 'admin123';
+function showLoginRole(role){
+  document.getElementById('agent-login-area').style.display = role==='agent' ? '' : 'none';
+  document.getElementById('mgr-login-area').style.display = role==='manager' ? '' : 'none';
+  document.getElementById('tab-agent-btn').classList.toggle('active', role==='agent');
+  document.getElementById('tab-mgr-btn').classList.toggle('active', role==='manager');
+}
+function doAgentLogin(){
+  const name = document.getElementById('login-name').value.trim();
+  const match = AGENTS.find(a=>a.name.toLowerCase()===name.toLowerCase());
+  if(!match){ document.getElementById('login-error-agent').textContent='Name not found. Try your full name.'; return; }
+  currentRole='agent'; currentUser=match.name;
+  const saved = localStorage.getItem('aa_locked_'+match.name.replace(/\s/g,'_'));
+  if(!saved) localStorage.setItem('aa_locked_'+match.name.replace(/\s/g,'_'),'1');
+  launchApp();
+}
+function doManagerLogin(){
+  const pass = document.getElementById('login-pass').value;
+  if(pass!==MGR_PASS){ document.getElementById('login-error-mgr').textContent='Incorrect password.'; return; }
+  currentRole='manager'; currentUser='Ahmed Essam';
+  launchApp();
+}
+function launchApp(){
+  loadState();
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='';
+  document.getElementById('sidebar-name').textContent = currentUser;
+  document.getElementById('sidebar-role').textContent = currentRole==='manager'?'Manager':'Agent';
+  const ava = document.getElementById('sidebar-avatar');
+  ava.textContent = initials(currentUser);
+  ava.style.background = currentRole==='manager' ? 'var(--amber-bg)' : 'var(--blue-bg)';
+  ava.style.color = currentRole==='manager' ? 'var(--amber)' : 'var(--blue)';
+  if(currentRole==='manager'){
+    document.getElementById('mgr-fab').style.display='flex';
+    document.getElementById('mgr-pill').style.display='flex';
+    document.getElementById('sort-filter-bar').style.display='flex';
+    document.getElementById('nav-requests').style.display='flex';
+    populateMentorEditor();
+  } else {
+    document.getElementById('nav-requests').style.display='flex';
+    document.getElementById('agent-req-form').style.display='';
+  }
+  populateMonthSelect();
+  populateAgentFilterList();
+  renderSchedule();
+  updateRequestsBadge();
+}
+function logout(){
+  currentRole=null; currentUser=null;
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-name').value='';
+  document.getElementById('login-pass').value='';
+}
+
+// ─── TABS ────────────────────────────────────────────────────────────
+function switchTab(name, btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='requests') renderRequests();
+}
+
+// ─── SCHEDULE ────────────────────────────────────────────────────────
+const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const SHIFT_ORDER=['EM','M','LM','D','MD','N','ON','OFF','AN','SP','SUP','TR','NS','-'];
+
+function populateMonthSelect(){
+  const sel = document.getElementById('month-select');
+  const months=['2025-03','2025-04','2025-05','2025-06','2025-07','2025-08'];
+  sel.innerHTML = months.map(m=>{
+    const [y,mo]=m.split('-');
+    return `<option value="${m}" ${m===currentMonth?'selected':''}>${MONTHS[parseInt(mo)-1]} ${y}</option>`;
+  }).join('');
+}
+function setView(v, btn){
+  currentView=v;
+  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSchedule();
+}
+
+function getDatesInMonth(ym){
+  const [y,m]=ym.split('-').map(Number);
+  const days=[];
+  const d=new Date(y,m-1,1);
+  while(d.getMonth()===m-1){ days.push(d.toISOString().slice(0,10)); d.setDate(d.getDate()+1); }
+  return days;
+}
+function getWeeksInMonth(ym){
+  const dates=getDatesInMonth(ym);
+  const weeks=[];
+  let week=[];
+  dates.forEach(d=>{
+    week.push(d);
+    if(week.length===7||d===dates[dates.length-1]){ weeks.push(week); week=[]; }
+  });
+  return weeks;
+}
+function getTodayAndWeek(){
+  const today=new Date().toISOString().slice(0,10);
+  const d=new Date(); const dow=d.getDay();
+  const week=[];
+  for(let i=0;i<7;i++){
+    const dd=new Date(d); dd.setDate(d.getDate()-dow+i);
+    week.push(dd.toISOString().slice(0,10));
+  }
+  return {today,week};
+}
+
+function renderSchedule(){
+  currentMonth=document.getElementById('month-select').value;
+  const container=document.getElementById('sched-blocks');
+  container.innerHTML='';
+  let dates=[];
+  if(currentView==='month') dates=getDatesInMonth(currentMonth);
+  else if(currentView==='week'){ const {week}=getTodayAndWeek(); dates=week; }
+  else { const {today}=getTodayAndWeek(); dates=[today]; }
+
+  const weeks = currentView==='month' ? getWeeksInMonth(currentMonth) : [dates];
+  const today=new Date().toISOString().slice(0,10);
+
+  let agents = currentRole==='agent' ? AGENTS.filter(a=>a.name===currentUser) : AGENTS;
+  if(agentFilter) agents=agents.filter(a=>a.name===agentFilter);
+
+  weeks.forEach(week=>{
+    const block=document.createElement('div');
+    block.className='week-block';
+    const label=week[0]+' – '+week[week.length-1];
+    block.innerHTML=`<div class="week-header"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="opacity:.5"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="1" y1="4" x2="11" y2="4" stroke="currentColor" stroke-width="1"/></svg> Week: ${label}</div>`;
+
+    let agentsSorted = [...agents];
+    if(sortByShift && week.length>0){
+      const refDay=week[0];
+      agentsSorted.sort((a,b)=>{
+        const sa=getShift(refDay,a.name), sb=getShift(refDay,b.name);
+        return (SHIFT_ORDER.indexOf(sa)||99)-(SHIFT_ORDER.indexOf(sb)||99);
+      });
+    }
+
+    const tbl=document.createElement('table');
+    tbl.className='week-table';
+    // header
+    let hdr='<thead><tr><th style="text-align:left;min-width:130px">Agent</th>';
+    week.forEach(d=>{
+      const dt=new Date(d+'T00:00:00');
+      const isToday=d===today;
+      hdr+=`<th class="date-col${isToday?' today-col':''}" data-date="${d}">`;
+      if(HOLIDAYS[d]) hdr+=`<span class="holiday-tag" title="${HOLIDAYS[d]}">${HOLIDAYS[d]}</span>`;
+      hdr+=`${DAYS[dt.getDay()]}<br><span style="font-size:14px;font-weight:700;color:var(--text1)">${dt.getDate()}</span></th>`;
+    });
+    hdr+='</tr></thead>';
+    tbl.innerHTML=hdr;
+
+    const tbody=document.createElement('tbody');
+    agentsSorted.forEach(ag=>{
+      const tr=document.createElement('tr');
+      const isMe = ag.name===currentUser;
+      tr.innerHTML=`<td class="agent-col">
+        <div class="agent-info" data-agent="${ag.name}" onmouseenter="showAgentTooltip(event,'${ag.name}')" onmouseleave="hideAgentTooltip()">
+          <div class="agent-ava" style="background:${agentColor(ag.name,0.15)};color:${agentColor(ag.name,1)}">${initials(ag.name)}</div>
+          <span class="agent-name" style="${isMe?'color:var(--blue)':''}">${ag.name}</span>
+        </div>
+      </td>`;
+      week.forEach(d=>{
+        const shift=getShift(d,ag.name);
+        const sdef=SHIFTS[shift]||{name:shift,time:'',cls:'s-DASH'};
+        const isToday=d===today;
+        const canEdit=currentRole==='manager';
+        const td=document.createElement('td');
+        td.className=(isToday?'today-col ':'')+(canEdit?'edit-cell':'');
+        td.dataset.date=d; td.dataset.agent=ag.name;
+        td.innerHTML=`<span class="shift-pill ${sdef.cls}" onmouseenter="showShiftTooltip(event,'${shift}')" onmouseleave="hideShiftTooltip()">${shift}</span>`;
+        if(canEdit) td.onclick=e=>openShiftEditor(e,d,ag.name);
+        tbody.appendChild(tr);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    block.appendChild(tbl);
+    container.appendChild(block);
+  });
+
+  renderJournal(dates, agents);
+}
+
+// ─── JOURNAL ────────────────────────────────────────────────────────
+function renderJournal(dates, agents){
+  const body=document.getElementById('journal-body');
+  const absentTypes=['OFF','AN','SP','SUP','NS','-'];
+  let items=[];
+  const dateSet = currentView==='today' ? [dates[0]] : dates;
+  agents.forEach(ag=>{
+    dateSet.forEach(d=>{
+      const sh=getShift(d,ag.name);
+      if(['AN','SP','SUP','NS','OFF'].includes(sh)){
+        const dt=new Date(d+'T00:00:00');
+        items.push({name:ag.name,shift:sh,date:d,label:`${DAYS[dt.getDay()]} ${dt.getDate()}`});
+      }
+    });
+  });
+  if(!items.length){ body.innerHTML='<div class="j-empty">All agents scheduled ✓</div>'; return; }
+  const typeLabel={'OFF':'Day Off','AN':'Annual Leave','SP':'Sick (Planned)','SUP':'Sick (Unplanned)','NS':'No Show'};
+  const typeClass={'OFF':'j-off','AN':'j-leave','SP':'j-sick','SUP':'j-sick','NS':'j-ns'};
+  body.innerHTML=items.map(i=>`<div class="journal-item ${typeClass[i.shift]||'j-off'}">
+    <div class="j-name">${i.name}</div>
+    <div class="j-type">${typeLabel[i.shift]||i.shift} · ${i.label}</div>
+  </div>`).join('');
+}
+
+// ─── AGENT TOOLTIP ──────────────────────────────────────────────────
+function showAgentTooltip(e, name){
+  const ag=AGENTS.find(a=>a.name===name); if(!ag) return;
+  const mentor = mentors[name]||ag.mentor||'—';
+  const tt=document.getElementById('agent-tooltip');
+  const tasks=ag.tasks.map((t,i)=>{
+    const key=name+'|'+i;
+    const checked=taskDone[key]?'checked':'';
+    return `<label class="tt-task"><input type="checkbox" ${checked} onchange="toggleTask('${name}',${i},this)"/> ${t}</label>`;
+  }).join('');
+  tt.innerHTML=`
+    <div class="tt-header">
+      <div class="agent-ava" style="background:${agentColor(name,0.15)};color:${agentColor(name,1)};width:32px;height:32px;font-size:12px">${initials(name)}</div>
+      <div><div class="tt-name">${name}</div><div class="tt-title">${ag.title}</div></div>
+    </div>
+    <div class="tt-row"><span class="tt-label">Role</span><span class="tt-val">${ag.role}</span></div>
+    <div class="tt-row"><span class="tt-label">Skill</span><span class="tt-val">${ag.skill}</span></div>
+    <div class="tt-row"><span class="tt-label">Mentor</span><span class="tt-val">${mentor}</span></div>
+    <div class="tt-tasks"><div class="tt-tasks-title">Tasks</div>${tasks}</div>`;
+  positionTooltip(tt, e);
+  tt.style.display='block';
+}
+function hideAgentTooltip(){ document.getElementById('agent-tooltip').style.display='none'; }
+function toggleTask(name,idx,el){
+  const key=name+'|'+idx;
+  taskDone[key]=el.checked;
+  saveState();
+}
+function positionTooltip(el,e){
+  el.style.left='0px'; el.style.top='0px'; el.style.display='block';
+  const r=el.getBoundingClientRect();
+  let x=e.clientX+14, y=e.clientY-10;
+  if(x+r.width>window.innerWidth-10) x=e.clientX-r.width-14;
+  if(y+r.height>window.innerHeight-10) y=window.innerHeight-r.height-10;
+  el.style.left=x+'px'; el.style.top=y+'px';
+}
+
+// ─── SHIFT TOOLTIP ──────────────────────────────────────────────────
+function showShiftTooltip(e,code){
+  const s=SHIFTS[code]; if(!s) return;
+  const tt=document.getElementById('shift-tooltip');
+  tt.innerHTML=`<strong>${s.name}</strong><span>${s.time}</span>`;
+  positionTooltip(tt,e);
+  tt.style.display='block';
+}
+function hideShiftTooltip(){ document.getElementById('shift-tooltip').style.display='none'; }
+
+// ─── SHIFT EDITOR ───────────────────────────────────────────────────
+let editTarget=null;
+function openShiftEditor(e,date,agent){
+  e.stopPropagation();
+  const dd=document.getElementById('shift-dropdown');
+  editTarget={date,agent};
+  dd.innerHTML=Object.entries(SHIFTS).map(([k,v])=>
+    `<div class="shift-option" onclick="applyShift('${k}')">
+      <span class="shift-pill ${v.cls}" style="min-width:38px;font-size:10px">${k}</span>
+      <span style="color:var(--text2);font-size:11px">${v.name}</span>
+    </div>`
+  ).join('');
+  const r=e.currentTarget.getBoundingClientRect();
+  let x=r.left, y=r.bottom+4;
+  dd.style.left=x+'px'; dd.style.top=y+'px'; dd.style.display='block';
+}
+function applyShift(code){
+  if(!editTarget) return;
+  const key=editTarget.date+'|'+editTarget.agent;
+  schedData[key]=code;
+  saveState();
+  document.getElementById('shift-dropdown').style.display='none';
+  renderSchedule();
+}
+document.addEventListener('click',()=>{ document.getElementById('shift-dropdown').style.display='none'; });
+
+// ─── SORT & FILTER ──────────────────────────────────────────────────
+function toggleSort(){
+  sortByShift=!sortByShift;
+  const btn=document.getElementById('sort-btn');
+  btn.classList.toggle('active',sortByShift);
+  btn.textContent=sortByShift?'Sorted by Shift ✓':'Sort by Shift';
+  renderSchedule();
+}
+function populateAgentFilterList(){
+  const list=document.getElementById('afd-list');
+  list.innerHTML=`<div class="afd-item" onclick="selectAgentFilter(null)">All Agents</div>`+
+    AGENTS.map(a=>`<div class="afd-item" id="afd-${a.name.replace(/\s/g,'_')}" onclick="selectAgentFilter('${a.name}')">
+      <div class="agent-ava" style="background:${agentColor(a.name,0.15)};color:${agentColor(a.name,1)};width:22px;height:22px;font-size:10px">${initials(a.name)}</div>
+      ${a.name}</div>`).join('');
+}
+function toggleAgentDropdown(){
+  const dd=document.getElementById('agent-filter-dd');
+  dd.classList.toggle('open');
+  if(dd.classList.contains('open')) document.getElementById('afd-search-input').focus();
+}
+function filterAgentList(){
+  const q=document.getElementById('afd-search-input').value.toLowerCase();
+  document.querySelectorAll('#afd-list .afd-item').forEach(el=>{
+    el.style.display=el.textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
+function selectAgentFilter(name){
+  agentFilter=name;
+  document.getElementById('agent-filter-btn').textContent=name?name+' ▾':'All Agents ▾';
+  document.getElementById('agent-filter-dd').classList.remove('open');
+  const tag=document.getElementById('af-active-tag');
+  if(name){ tag.style.display='flex'; document.getElementById('af-tag-name').textContent=name; }
+  else tag.style.display='none';
+  document.querySelectorAll('#afd-list .afd-item').forEach(el=>el.classList.remove('selected'));
+  if(name){ const el=document.getElementById('afd-'+name.replace(/\s/g,'_')); if(el) el.classList.add('selected'); }
+  renderSchedule();
+}
+function clearAgentFilter(){ selectAgentFilter(null); }
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.agent-filter-wrap')) document.getElementById('agent-filter-dd')?.classList.remove('open');
+});
+
+// ─── RESET WEEK ─────────────────────────────────────────────────────
+function resetWeekSchedule(){
+  if(!confirm('Remove all manually-set shifts for the current week? Base schedule data will remain.')) return;
+  const {week}=getTodayAndWeek();
+  week.forEach(d=>AGENTS.forEach(a=>{ delete schedData[d+'|'+a.name]; }));
+  saveState(); renderSchedule();
+}
+function resetAllData(){
+  if(!confirm('Reset ALL portal data? This cannot be undone.')) return;
+  localStorage.clear(); location.reload();
+}
+
+// ─── MENTOR EDITOR ──────────────────────────────────────────────────
+function populateMentorEditor(){
+  const el=document.getElementById('mentor-editor');
+  el.innerHTML='<div style="font-size:13px;font-weight:600;margin-bottom:10px">Agent Mentors</div>'+
+    AGENTS.map(a=>{
+      const m=mentors[a.name]||a.mentor||'';
+      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:12px;flex:1">${a.name}</span>
+        <input type="text" value="${m}" placeholder="Mentor name" 
+          style="flex:1.2;padding:5px 10px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text1);font-size:12px;font-family:'DM Sans',sans-serif;outline:none"
+          onchange="mentors['${a.name}']=this.value;saveState()"/>
+      </div>`;
+    }).join('');
+}
+function toggleMgrPanel(){
+  document.getElementById('mgr-panel').classList.toggle('open');
+}
+
+// ─── REQUESTS ───────────────────────────────────────────────────────
+function submitRequest(){
+  const type=document.getElementById('req-type').value;
+  const date=document.getElementById('req-date').value;
+  const reason=document.getElementById('req-reason').value.trim();
+  if(!date){ alert('Please select a date.'); return; }
+  requests.push({id:Date.now(),agent:currentUser,type,date,reason,status:'pending'});
+  saveState(); updateRequestsBadge();
+  document.getElementById('req-date').value='';
+  document.getElementById('req-reason').value='';
+  alert('Request submitted successfully!');
+  renderRequests();
+}
+function renderRequests(){
+  const mgrList=document.getElementById('mgr-requests-list');
+  const agentForm=document.getElementById('agent-req-form');
+  const logBody=document.getElementById('req-log-body');
+  if(currentRole==='manager'){
+    mgrList.style.display='';
+    const pending=requests.filter(r=>r.status==='pending');
+    document.getElementById('req-count-badge').textContent=pending.length;
+    document.getElementById('req-list-body').innerHTML=pending.length?
+      pending.map(r=>reqCard(r,true)).join(''):'<div style="color:var(--text3);font-size:13px">No pending requests.</div>';
+  }
+  const myReqs=currentRole==='manager'?requests:requests.filter(r=>r.agent===currentUser);
+  logBody.innerHTML=myReqs.length?myReqs.map(r=>reqCard(r,false)).join(''):
+    '<div style="color:var(--text3);font-size:13px">No requests yet.</div>';
+}
+function reqCard(r,showActions){
+  const typeMap={'EL':'Early Leave','LA':'Late Arrival'};
+  const statusColor={'pending':'amber','approved':'green','rejected':'red'};
+  const c=statusColor[r.status]||'blue';
+  return `<div class="request-card">
+    <div>
+      <span class="req-badge req-${r.type.toLowerCase()}">${typeMap[r.type]||r.type}</span>
+    </div>
+    <div class="req-info">
+      <strong>${r.agent}</strong>
+      <span>${r.date}${r.reason?' · '+r.reason:''}</span>
+      <span style="color:var(--${c});font-size:11px;font-weight:600;margin-top:4px;display:block">${r.status.toUpperCase()}</span>
+      ${showActions&&r.status==='pending'?`<div class="req-actions">
+        <button class="btn-approve" onclick="approveReq(${r.id})">Approve</button>
+        <button class="btn-reject" onclick="rejectReq(${r.id})">Reject</button>
+      </div>`:''}
+    </div>
+  </div>`;
+}
+function approveReq(id){ const r=requests.find(x=>x.id===id); if(r){ r.status='approved'; saveState(); updateRequestsBadge(); renderRequests(); }}
+function rejectReq(id){ const r=requests.find(x=>x.id===id); if(r){ r.status='rejected'; saveState(); updateRequestsBadge(); renderRequests(); }}
+function updateRequestsBadge(){
+  const n=requests.filter(r=>r.status==='pending').length;
+  const badge=document.getElementById('req-badge');
+  badge.textContent=n; badge.style.display=n?'':'none';
+}
+
+// ─── UTILS ──────────────────────────────────────────────────────────
+function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+const COLOR_SEEDS=['#58a6ff','#3fb950','#f0c75e','#bc8cff','#ffa64d','#39d3c7','#ff6b9d','#56d39e','#8b9edd','#f85149','#d4a017','#7ee787'];
+function agentColor(name,alpha){
+  let h=0; for(let i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))%COLOR_SEEDS.length;
+  const hex=COLOR_SEEDS[h];
+  if(alpha===1) return hex;
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+</script>
+</body>
+</html>
